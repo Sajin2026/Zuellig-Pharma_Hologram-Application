@@ -27,7 +27,13 @@ input[readonly].auto{background:#f0f6fa;color:#0b5d95;font-weight:bold}
 .btn{border:1px solid #9eabb4;background:#fff;color:#173f61;padding:8px 13px;border-radius:2px;cursor:pointer;font-weight:bold}.btn:hover{background:#edf3f6}.primary{background:#0b5d95;color:white;border-color:#0b5d95}.accept{background:#19733e;color:white;border-color:#19733e}.danger{background:#b0202c;color:white;border-color:#b0202c}.danger:hover{background:#911422}
 .actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:13px}.status{padding:5px 0;font-weight:normal}.success{color:#10733b}.warning{color:#a45c00}.error{color:#b00020}
 table{width:100%;border-collapse:collapse;font-size:12px}th{background:#e8eef2;color:#29485e;text-align:left;padding:9px;border:1px solid #d0d9de}td{padding:9px;border:1px solid #d0d9de}
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:700px){.tablewrap table{min-width:640px}}
 .modal{display:none;position:fixed;inset:0;background:#0007;align-items:center;justify-content:center;z-index:10}.modal-box{background:#fff;width:440px;max-width:92%;padding:18px;border-radius:2px;box-shadow:0 10px 40px #0005}.modal-title{font-size:20px;color:#173f61;font-weight:bold;margin-bottom:14px}
+.qrmodal-box{width:420px}
+.qrvideo-wrap{position:relative;background:#0c1a24;border-radius:4px;overflow:hidden;aspect-ratio:1/1;max-height:320px}
+.qrvideo-wrap video{width:100%;height:100%;object-fit:cover;display:block}
+.qrframe{position:absolute;inset:14%;border:3px solid #34d17a;border-radius:8px;box-shadow:0 0 0 1000px #00000055;pointer-events:none}
 @media(max-width:700px){.header{height:auto;gap:10px;flex-wrap:wrap}.logo{width:180px}.main{padding:10px}}
 
 .report-criteria{background:#fff;border:1px solid #c7d1d8;padding:12px;margin-top:10px}
@@ -72,6 +78,14 @@ table{width:100%;border-collapse:collapse;font-size:12px}th{background:#e8eef2;c
 </div></div>
 
 <div id="previewModal" class="modal"><div class="previewbox"><div class="modal-title">Report Preview</div><div id="previewContent"></div><div class="modalactions"><button class="btn" onclick="document.getElementById('previewModal').style.display='none'">Close</button></div></div></div>
+
+<div id="qrModal" class="modal"><div class="modal-box qrmodal-box">
+<div class="modal-title">Scan QR Code</div>
+<div class="qrvideo-wrap"><video id="qrVideo" autoplay playsinline muted></video><div class="qrframe"></div></div>
+<div id="qrStatus" class="status">Requesting camera access…</div>
+<div class="grid" style="margin-top:10px"><div><label>Or enter code manually</label><input id="qrManual" placeholder="Type serial / QR value"></div></div>
+<div class="actions"><button class="btn primary" onclick="qrManualSubmit()">Use This Value</button><button class="btn" onclick="closeQrModal()">Cancel</button></div>
+</div></div>
 <script>
 const ibds=[
 {id:'IBD-4500123456',vendor:'Zuellig Pharma Sdn Bhd',material:'HGM-001 / Hologram Label',delivery:'4500123456',batch:'HGM-2026-08',batchId:'B20260815',qty:'5000',start:'HGM260815000001',end:'HGM260815005000',expiry:'2027-08-15'},
@@ -79,11 +93,11 @@ const ibds=[
 {id:'IBD-4500123522',vendor:'Vendor B Pharma',material:'HGM-003 / Clinical Label',delivery:'4500123522',batch:'HGM-2026-09B',batchId:'B20260909',qty:'2500',start:'HGM260909000001',end:'HGM260909002500',expiry:'2027-09-09'}
 ];
 let usersData=[
-['admin','admin, hologram','clorenzo@zuelligpharma.com','PM Admin','NO','NO','8/17/2026 3:38 PM','Active'],
-['malcantara','Malcantara, Mark','malcantara@zuelligpharma.com','PM User','NO','NO','8/11/2026 11:45 AM','Active'],
-['amalina','Amalin, Nor','nazihans@zuelligpharma.com','PM User','NO','NO','6/30/2026 6:03 PM','Active'],
-['Visvaraj','Ambigabadi, Visvaraj','ambigabadi@zuelligpharma.com','Auditor','NO','NO','5/19/2026 5:18 PM','Active'],
-['Lorance','Ambrose, Lorance','lambrose@zuelligpharma.com','PM User','NO','NO','9/7/2026 3:41 PM','Active']
+['admin','admin, hologram','clorenzo@zuelligpharma.com','PM Admin','NO','NO','0','8/17/2026 3:38 PM','Active'],
+['malcantara','Malcantara, Mark','malcantara@zuelligpharma.com','PM User','NO','NO','0','8/11/2026 11:45 AM','Active'],
+['amalina','Amalin, Nor','nazihans@zuelligpharma.com','PM User','NO','NO','1','6/30/2026 6:03 PM','Active'],
+['Visvaraj','Ambigabadi, Visvaraj','ambigabadi@zuelligpharma.com','Auditor','NO','NO','0','5/19/2026 5:18 PM','Active'],
+['Lorance','Ambrose, Lorance','lambrose@zuelligpharma.com','PM User','NO','NO','2','9/7/2026 3:41 PM','Active']
 ];
 const roleAccessMatrix=[
 ['PM Admin','Full','Full','Full','Full','Full'],
@@ -100,10 +114,52 @@ function panel(a,b){return `<section class="panel"><div class="panel-title">${a}
 function field(l,c){return `<div><label>${l}</label>${c}</div>`}
 function inp(id,v='',ro=false){return `<input id="${id}" value="${v}" ${ro?'readonly':''}>`}
 function qrIcon(id,onInput){return `<div class="serialbox"><input id="${id}" value="" ${onInput?`oninput="${onInput}"`:''}><button type="button" class="qrbtn" title="Scan QR Code" aria-label="Scan QR Code" onclick="scan('${id}')"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#0b5d95" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#0b5d95" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#0b5d95" stroke-width="2"/><rect x="5.5" y="5.5" width="2" height="2" fill="#0b5d95"/><rect x="16.5" y="5.5" width="2" height="2" fill="#0b5d95"/><rect x="5.5" y="16.5" width="2" height="2" fill="#0b5d95"/><rect x="14" y="14" width="3" height="3" fill="#0b5d95"/><rect x="18" y="14" width="3" height="3" fill="#0b5d95"/><rect x="14" y="18" width="3" height="3" fill="#0b5d95"/><rect x="18" y="18" width="3" height="3" fill="#0b5d95"/></svg></button></div>`}
-function scan(id){let v=prompt('Camera scan (simulated)\nThe device camera would open here to scan a QR code. Enter the serial value to simulate a successful scan:',document.getElementById(id).value||'');if(v!==null){document.getElementById(id).value=v;if(document.getElementById(id).oninput)document.getElementById(id).oninput()}}
+let qrStream=null,qrTargetId=null,qrDetectTimer=null;
+async function scan(id){
+qrTargetId=id;
+document.getElementById('qrManual').value='';
+document.getElementById('qrStatus').textContent='Requesting camera access…';
+document.getElementById('qrModal').style.display='flex';
+if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){document.getElementById('qrStatus').innerHTML='<span class="warning">Camera not available on this device/browser. Enter the code manually below.</span>';return}
+try{
+qrStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+let video=document.getElementById('qrVideo');
+video.srcObject=qrStream;
+await video.play();
+document.getElementById('qrStatus').innerHTML='Point the camera at the hologram QR code.';
+startQrDetection();
+}catch(err){
+document.getElementById('qrStatus').innerHTML='<span class="warning">Camera access denied or unavailable ('+(err&&err.message?err.message:err)+'). Enter the code manually below.</span>';
+}
+}
+function startQrDetection(){
+if(!('BarcodeDetector' in window))return;
+let detector;
+try{detector=new BarcodeDetector({formats:['qr_code']})}catch(e){return}
+qrDetectTimer=setInterval(async()=>{
+let video=document.getElementById('qrVideo');
+if(!video||video.readyState<2)return;
+try{
+let codes=await detector.detect(video);
+if(codes&&codes.length){applyQrResult(codes[0].rawValue)}
+}catch(e){}
+},350);
+}
+function applyQrResult(value){
+if(qrTargetId){let el=document.getElementById(qrTargetId);el.value=value;if(el.oninput)el.oninput()}
+closeQrModal();
+msg('QR code captured.');
+}
+function qrManualSubmit(){let v=document.getElementById('qrManual').value.trim();if(!v)return msg('Enter a value, or allow camera access to scan automatically.');applyQrResult(v)}
+function closeQrModal(){
+if(qrDetectTimer){clearInterval(qrDetectTimer);qrDetectTimer=null}
+if(qrStream){qrStream.getTracks().forEach(t=>t.stop());qrStream=null}
+let video=document.getElementById('qrVideo');if(video)video.srcObject=null;
+document.getElementById('qrModal').style.display='none';
+}
 function serialSuffix(v){let m=String(v||'').trim().match(/(\d+)$/);return m?parseInt(m[1],10):null}
 function serialQty(startId,endId){let s=serialSuffix(document.getElementById(startId).value),e=serialSuffix(document.getElementById(endId).value);if(s===null||e===null||e<s)return '';return (e-s+1)}
-function tbl(h,rows){return `<table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table>`}
+function tbl(h,rows){return `<div class="tablewrap"><table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
 
 function dashboard(){setActive('dashboard');main.innerHTML=title('Hologram Serial Number Management','PM Admin dashboard')+
 `<div class="kpis">${[['18,450','Stock on Hand (SOH)'],['5,000','Receipted this month'],['3,240','Used this month'],['180','Withdrawn this month'],['0','Open reconciliation variances']].map(x=>`<div class="kpi"><div class="n">${x[0]}</div><div class="l">${x[1]}</div></div>`).join('')}</div>`+
@@ -219,8 +275,8 @@ function openScheduler(){msg('Scheduler is represented in this browser prototype
 function users(){setActive('users');main.innerHTML=title('User Management','Onboard new people, manage roles, status and access')+
 `<div class="actions" style="justify-content:flex-end"><button class="btn primary" onclick="openModal()">+ Add New User</button></div>`+
 panel('Hologram User List View',
-tbl(['','Username','Full Name','Email Address','Role','Suspended','Locked','Last Login','Status'],
-usersData.map((r,i)=>[`<input type="radio" name="selUser" value="${i}">`,r[0],r[1],r[2],r[3],r[4],r[5],r[6],`<span class="success">${r[7]}</span>`]))+
+tbl(['','Username','Full Name','Email Address','Role','Suspended','Locked','Failed Login Attempts','Last Login','Status'],
+usersData.map((r,i)=>[`<input type="radio" name="selUser" value="${i}">`,r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7],`<span class="success">${r[8]}</span>`]))+
 `<div class="actions"><button class="btn primary" onclick="openModal()"><span>👤</span> Add New User</button><button class="btn" onclick="viewSelectedUser()">View Selected User</button><button class="btn" onclick="modifySelectedUser()">Modify Selected User</button><button class="btn danger" onclick="deleteSelectedUser()">Delete Selected User</button></div>`)+
 panel('Role & Access Matrix',
 tbl(['Role','Receipting','Usage','Withdrawal','Reports','User Management'],
@@ -228,10 +284,10 @@ roleAccessMatrix.map(r=>[`<span class="matrix-role">${r[0]}</span>`,r[1],r[2],r[
 function getSelectedUserIndex(){let r=document.querySelector('input[name="selUser"]:checked');return r?+r.value:null}
 function openModal(){editingUserIndex=null;document.getElementById('modalTitle').textContent='Add New User';document.getElementById('modalSaveBtn').textContent='Create User';nu.value='';nn.value='';ne.value='';nr.value='PM Admin';document.getElementById('modal').style.display='flex'}
 function modifySelectedUser(){let i=getSelectedUserIndex();if(i===null)return msg('Please select a user from the list.');let u=usersData[i];editingUserIndex=i;document.getElementById('modalTitle').textContent='Modify Selected User';document.getElementById('modalSaveBtn').textContent='Save Changes';nu.value=u[0];nn.value=u[1];ne.value=u[2];nr.value=u[3];document.getElementById('modal').style.display='flex'}
-function viewSelectedUser(){let i=getSelectedUserIndex();if(i===null)return msg('Please select a user from the list.');let u=usersData[i];msg(`Username: ${u[0]}\nFull Name: ${u[1]}\nEmail Address: ${u[2]}\nRole: ${u[3]}\nSuspended: ${u[4]}\nLocked: ${u[5]}\nLast Login: ${u[6]}\nStatus: ${u[7]}`)}
+function viewSelectedUser(){let i=getSelectedUserIndex();if(i===null)return msg('Please select a user from the list.');let u=usersData[i];msg(`Username: ${u[0]}\nFull Name: ${u[1]}\nEmail Address: ${u[2]}\nRole: ${u[3]}\nSuspended: ${u[4]}\nLocked: ${u[5]}\nFailed Login Attempts: ${u[6]}\nLast Login: ${u[7]}\nStatus: ${u[8]}`)}
 function deleteSelectedUser(){let i=getSelectedUserIndex();if(i===null)return msg('Please select a user from the list.');let u=usersData[i];if(!confirm(`Delete user "${u[0]}"? This action is simulated in this prototype.`))return;usersData.splice(i,1);users();msg('Selected user deleted.')}
 function closeModal(){document.getElementById('modal').style.display='none'}
-function saveUser(){if(!nu.value||!nn.value||!ne.value)return msg('Enter username, full name and email.');if(editingUserIndex===null){usersData.push([nu.value,nn.value,ne.value,nr.value,'NO','NO','—','Active']);closeModal();users();msg('New user onboarded successfully.')}else{let u=usersData[editingUserIndex];usersData[editingUserIndex]=[nu.value,nn.value,ne.value,nr.value,u[4],u[5],u[6],u[7]];closeModal();users();msg('User updated successfully.')}}
+function saveUser(){if(!nu.value||!nn.value||!ne.value)return msg('Enter username, full name and email.');if(editingUserIndex===null){usersData.push([nu.value,nn.value,ne.value,nr.value,'NO','NO','0','—','Active']);closeModal();users();msg('New user onboarded successfully.')}else{let u=usersData[editingUserIndex];usersData[editingUserIndex]=[nu.value,nn.value,ne.value,nr.value,u[4],u[5],u[6],u[7],u[8]];closeModal();users();msg('User updated successfully.')}}
 function settings(){setActive('settings');main.innerHTML=title('Settings','Application controls and business rules')+
 panel('Business Controls',`<div class="grid">
 ${field('Prevent Negative SOH','<select><option>Enabled</option><option>Disabled</option></select>')}
