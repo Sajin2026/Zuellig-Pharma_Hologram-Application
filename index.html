@@ -24,6 +24,23 @@ input,select,textarea{width:100%;border:1px solid #aebbc3;border-radius:2px;padd
 input[readonly].auto{background:#f0f6fa;color:#0b5d95;font-weight:bold}
 .checkcol{width:34px;text-align:center}
 .matrix-role{font-weight:bold;color:#173f61}
+.expiry-cards{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.expiry-card{background:#fff;border:1px solid #c7d1d8;padding:14px 17px;min-width:165px;flex:1;box-shadow:0 1px 3px #0001;cursor:pointer;transition:box-shadow .15s,border-color .15s}
+.expiry-card:hover{box-shadow:0 3px 10px #0002;border-color:#0b5d95}
+.expiry-card .n{font-size:23px;font-weight:bold}
+.expiry-card .l{font-size:12px;color:#687b87;margin-top:3px}
+.expiry-card.c1 .n{color:#b00020}.expiry-card.c2 .n{color:#a45c00}.expiry-card.c3 .n{color:#0b5d95}.expiry-card.c4 .n{color:#173f61}
+.filterrow{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:12px 0 4px}
+.filterrow label{display:block;font-weight:bold;font-size:12px;color:#526b79;margin-bottom:5px}
+.filterrow input,.filterrow select{height:36px;border:1px solid #b9c6d0;border-radius:4px;padding:7px}
+.linebar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:10px}
+.linebar .totals{font-size:12px;color:#526b79}
+.linebar .totals b{color:#173f61}
+.attach-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.attach-thumb{position:relative;width:84px;height:84px;border:1px solid #c7d1d8;border-radius:4px;overflow:hidden;background:#f5f7f8}
+.attach-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.attach-thumb button{position:absolute;top:2px;right:2px;background:#00000090;color:#fff;border:0;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1;padding:0}
+.attach-thumb .fname{position:absolute;bottom:0;left:0;right:0;background:#00000090;color:#fff;font-size:9px;padding:2px 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .btn{border:1px solid #9eabb4;background:#fff;color:#173f61;padding:8px 13px;border-radius:2px;cursor:pointer;font-weight:bold}.btn:hover{background:#edf3f6}.primary{background:#0b5d95;color:white;border-color:#0b5d95}.accept{background:#19733e;color:white;border-color:#19733e}.danger{background:#b0202c;color:white;border-color:#b0202c}.danger:hover{background:#911422}
 .actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:13px}.status{padding:5px 0;font-weight:normal}.success{color:#10733b}.warning{color:#a45c00}.error{color:#b00020}
 table{width:100%;border-collapse:collapse;font-size:12px}th{background:#e8eef2;color:#29485e;text-align:left;padding:9px;border:1px solid #d0d9de}td{padding:9px;border:1px solid #d0d9de}
@@ -37,13 +54,14 @@ table{width:100%;border-collapse:collapse;font-size:12px}th{background:#e8eef2;c
 @media(max-width:700px){.header{height:auto;gap:10px;flex-wrap:wrap}.logo{width:180px}.main{padding:10px}}
 
 .report-criteria{background:#fff;border:1px solid #c7d1d8;padding:12px;margin-top:10px}
-.report-grid{display:grid;grid-template-columns:150px 320px 150px 150px 1fr;gap:12px;align-items:end}
+.report-grid{display:grid;grid-template-columns:140px 260px 130px 130px 130px 1fr;gap:12px;align-items:end}
 .report-grid label{text-align:left;display:block;margin-bottom:5px;color:#526572;font-weight:normal}
 .report-grid input,.report-grid select{height:36px;width:100%;border:1px solid #b9c6d0;border-radius:4px;padding:7px;background:#fff}
 .report-actions{display:flex;gap:8px;align-items:end;justify-content:flex-end}
 .stockcalc{border:1px dashed #aebbc5;background:#fff;padding:14px;margin-top:10px;display:grid;grid-template-columns:1fr 35px 1fr 35px 1fr;align-items:center}
 .note{margin-top:10px;color:#687986;font-size:12px}.stockcalc .cap{font-size:12px;color:#687986}.stockcalc .val{font-size:18px;font-weight:bold;margin-top:5px}.stockcalc .deduct{color:#b00020}.stockcalc .after{color:#087c35}.stockcalc .arrow{text-align:center;color:#657681;font-size:20px}
 .previewbox{width:900px;max-width:95%;max-height:88vh;overflow:auto;background:#fff;padding:18px;border:1px solid #777}
+.redbar{margin-top:24px;background:#7e1d2b;color:#fff;padding:9px 12px;font-weight:bold;letter-spacing:.3px}
 .previewbox h2{margin:0 0 12px;color:#7e1d2b}.previewbox table{width:100%;border-collapse:collapse}.previewbox th,.previewbox td{border:1px solid #ccc;padding:7px;text-align:left}.previewbox th{background:#eee}
 @media(max-width:1050px){.report-grid{grid-template-columns:1fr 1fr}.stockcalc{grid-template-columns:1fr 25px 1fr 25px 1fr}}
 </style>
@@ -83,8 +101,14 @@ table{width:100%;border-collapse:collapse;font-size:12px}th{background:#e8eef2;c
 <div class="modal-title">Scan QR Code</div>
 <div class="qrvideo-wrap"><video id="qrVideo" autoplay playsinline muted></video><div class="qrframe"></div></div>
 <div id="qrStatus" class="status">Requesting camera access…</div>
-<div class="grid" style="margin-top:10px"><div><label>Or enter code manually</label><input id="qrManual" placeholder="Type serial / QR value"></div></div>
+<div class="grid" style="margin-top:10px"><div><label>Or enter code manually</label><input id="qrManual" placeholder="Type value, or Prefix|Start|End|Suffix to fill all fields at once"></div></div>
 <div class="actions"><button class="btn primary" onclick="qrManualSubmit()">Use This Value</button><button class="btn" onclick="closeQrModal()">Cancel</button></div>
+</div></div>
+
+<div id="mismatchModal" class="modal"><div class="modal-box">
+<div class="modal-title" style="color:#b00020">⚠ Quantity Mismatch</div>
+<div id="mismatchText" class="status"></div>
+<div class="actions" style="margin-top:14px"><button class="btn" onclick="closeMismatchModal()">Go Back &amp; Correct</button><button class="btn accept" onclick="mismatchProceed()">Proceed Anyway</button></div>
 </div></div>
 <script>
 const ibds=[
@@ -92,6 +116,32 @@ const ibds=[
 {id:'IBD-4500123481',vendor:'Vendor A Healthcare',material:'HGM-002 / Security Hologram',delivery:'4500123481',batch:'HGM-2026-09',batchId:'B20260903',qty:'3000',start:'HGM260903000001',end:'HGM260903003000',expiry:'2027-09-03'},
 {id:'IBD-4500123522',vendor:'Vendor B Pharma',material:'HGM-003 / Clinical Label',delivery:'4500123522',batch:'HGM-2026-09B',batchId:'B20260909',qty:'2500',start:'HGM260909000001',end:'HGM260909002500',expiry:'2027-09-09'}
 ];
+const obdDocuments=[
+{id:'OBD-80000321',vendorCode:'41230',vendorName:'100120 - MEGA LIFE SCIENCES SDN BHD',date:'08/09/2026',details:'Damaged hologram — batch inspection'},
+{id:'OBD-80000355',vendorCode:'2303041',vendorName:'100124 - GLAXO SMITHKLINE PHARMACEUTICA',date:'09/09/2026',details:'Near-expiry withdrawal'},
+{id:'OBD-80000390',vendorCode:'597786',vendorName:'100158 - PFIZER (MALAYSIA) SDN BHD',date:'10/09/2026',details:'Client request — return to vendor'}
+];
+const EXPIRY_REF=new Date('2026-09-10T00:00:00');
+const expiryData=[
+{serial:'000000310485001',batch:'008_260170',vendor:'100124 - GLAXO SMITHKLINE PHARMACEUTICA',material:'31084472',qty:1200,expiry:'2026-09-15'},
+{serial:'000000310485055',batch:'008_260170',vendor:'100124 - GLAXO SMITHKLINE PHARMACEUTICA',material:'31084472',qty:800,expiry:'2026-09-16'},
+{serial:'000000121500001',batch:'019_260341',vendor:'100249 - RECKITT BENCKISER (M) SDN BHD',material:'31081075',qty:15000,expiry:'2026-09-20'},
+{serial:'000000297390001',batch:'010_260117',vendor:'100225 - MERCK SDN BHD',material:'31008037',qty:15000,expiry:'2026-10-05'},
+{serial:'000000310485301',batch:'HGM-2026-09',vendor:'Zuellig Pharma Sdn Bhd',material:'HGM-002',qty:3000,expiry:'2026-10-25'},
+{serial:'000000310485401',batch:'HGM-2026-07',vendor:'Zuellig Pharma Sdn Bhd',material:'HGM-001',qty:500,expiry:'2026-11-09'},
+{serial:'000000121515001',batch:'019_260346',vendor:'100249 - RECKITT BENCKISER (M) SDN BHD',material:'31081075',qty:15000,expiry:'2026-12-09'},
+{serial:'000000297405001',batch:'010_260118',vendor:'100225 - MERCK SDN BHD',material:'31008037',qty:15000,expiry:'2027-01-08'}
+];
+function daysToExpire(d){return Math.ceil((new Date(d+'T00:00:00')-EXPIRY_REF)/86400000)}
+function expiryCount(min,max){return expiryData.filter(x=>{let d=daysToExpire(x.expiry);return d>=min&&d<=max}).length}
+function showExpiryDetail(minDays,maxDays){
+let rows=expiryData.map(x=>Object.assign({},x,{days:daysToExpire(x.expiry)})).filter(x=>x.days>=minDays&&x.days<=maxDays).sort((a,b)=>a.days-b.days);
+let heading=minDays===0?`Items Expiring within ${maxDays} Day(s)`:`Items Expiring in ${minDays}–${maxDays} Days`;
+let el=document.getElementById('expiryDetail');if(!el)return;
+el.innerHTML=rows.length?panel(heading,tbl(['Serial Number','Batch','Vendor','Material','Quantity','Expiry Date','Days to Expire'],rows.map(x=>[x.serial,x.batch,x.vendor,x.material,x.qty.toLocaleString(),x.expiry,x.days<=0?'<span class="warning">Expired</span>':x.days+' day(s)']))):panel(heading,'<div class="muted">No hologram items found in this expiry window.</div>');
+let dEl=document.getElementById('expiryFilterDays');if(dEl)dEl.value=maxDays;
+}
+function applyExpiryFilter(){let n=Number(document.getElementById('expiryFilterDays').value);if(isNaN(n)||n<0)return msg('Enter a valid number of days to filter by.');showExpiryDetail(0,n)}
 let usersData=[
 ['admin','admin, hologram','clorenzo@zuelligpharma.com','PM Admin','NO','NO','0','8/17/2026 3:38 PM','Active'],
 ['malcantara','Malcantara, Mark','malcantara@zuelligpharma.com','PM User','NO','NO','0','8/11/2026 11:45 AM','Active'],
@@ -113,7 +163,7 @@ function title(a,b){return `<div class="title">${a}</div><div class="subtitle">$
 function panel(a,b){return `<section class="panel"><div class="panel-title">${a}</div><div class="panel-body">${b}</div></section>`}
 function field(l,c){return `<div><label>${l}</label>${c}</div>`}
 function inp(id,v='',ro=false){return `<input id="${id}" value="${v}" ${ro?'readonly':''}>`}
-function qrIcon(id,onInput){return `<div class="serialbox"><input id="${id}" value="" ${onInput?`oninput="${onInput}"`:''}><button type="button" class="qrbtn" title="Scan QR Code" aria-label="Scan QR Code" onclick="scan('${id}')"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#0b5d95" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#0b5d95" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#0b5d95" stroke-width="2"/><rect x="5.5" y="5.5" width="2" height="2" fill="#0b5d95"/><rect x="16.5" y="5.5" width="2" height="2" fill="#0b5d95"/><rect x="5.5" y="16.5" width="2" height="2" fill="#0b5d95"/><rect x="14" y="14" width="3" height="3" fill="#0b5d95"/><rect x="18" y="14" width="3" height="3" fill="#0b5d95"/><rect x="14" y="18" width="3" height="3" fill="#0b5d95"/><rect x="18" y="18" width="3" height="3" fill="#0b5d95"/></svg></button></div>`}
+function qrIcon(id,onInput,val,groupJson){return `<div class="serialbox"><input id="${id}" value="${val?val:''}" ${onInput?`oninput="${onInput}"`:''} ${groupJson?`data-group='${groupJson}'`:''}><button type="button" class="qrbtn" title="Scan QR Code" aria-label="Scan QR Code" onclick="scan('${id}')"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#0b5d95" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#0b5d95" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#0b5d95" stroke-width="2"/><rect x="5.5" y="5.5" width="2" height="2" fill="#0b5d95"/><rect x="16.5" y="5.5" width="2" height="2" fill="#0b5d95"/><rect x="5.5" y="16.5" width="2" height="2" fill="#0b5d95"/><rect x="14" y="14" width="3" height="3" fill="#0b5d95"/><rect x="18" y="14" width="3" height="3" fill="#0b5d95"/><rect x="14" y="18" width="3" height="3" fill="#0b5d95"/><rect x="18" y="18" width="3" height="3" fill="#0b5d95"/></svg></button></div>`}
 let qrStream=null,qrTargetId=null,qrDetectTimer=null;
 async function scan(id){
 qrTargetId=id;
@@ -146,7 +196,24 @@ if(codes&&codes.length){applyQrResult(codes[0].rawValue)}
 },350);
 }
 function applyQrResult(value){
-if(qrTargetId){let el=document.getElementById(qrTargetId);el.value=value;if(el.oninput)el.oninput()}
+if(qrTargetId){
+let el=document.getElementById(qrTargetId);
+let group=el.getAttribute('data-group');
+let handled=false;
+if(group){
+try{
+let ids=JSON.parse(group);
+let parts=String(value).split('|');
+if(parts.length===4){
+[['prefix',0],['start',1],['end',2],['suffix',3]].forEach(([key,idx])=>{
+if(ids[key]){let e=document.getElementById(ids[key]);if(e){e.value=parts[idx];if(e.oninput)e.oninput()}}
+});
+handled=true;
+}
+}catch(e){}
+}
+if(!handled){el.value=value;if(el.oninput)el.oninput()}
+}
 closeQrModal();
 msg('QR code captured.');
 }
@@ -159,51 +226,147 @@ document.getElementById('qrModal').style.display='none';
 }
 function serialSuffix(v){let m=String(v||'').trim().match(/(\d+)$/);return m?parseInt(m[1],10):null}
 function serialQty(startId,endId){let s=serialSuffix(document.getElementById(startId).value),e=serialSuffix(document.getElementById(endId).value);if(s===null||e===null||e<s)return '';return (e-s+1)}
+function qtyFromRange(s,e){let sv=serialSuffix(s),ev=serialSuffix(e);if(sv===null||ev===null||ev<sv)return 0;return ev-sv+1}
+let mismatchProceedCallback=null;
+function showMismatchModal(html,onProceed){document.getElementById('mismatchText').innerHTML=html;mismatchProceedCallback=onProceed;document.getElementById('mismatchModal').style.display='flex'}
+function closeMismatchModal(){document.getElementById('mismatchModal').style.display='none';mismatchProceedCallback=null}
+function mismatchProceed(){if(mismatchProceedCallback){let cb=mismatchProceedCallback;closeMismatchModal();cb()}}
 function tbl(h,rows){return `<div class="tablewrap"><table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
 
 function dashboard(){setActive('dashboard');main.innerHTML=title('Hologram Serial Number Management','PM Admin dashboard')+
 `<div class="kpis">${[['18,450','Stock on Hand (SOH)'],['5,000','Receipted this month'],['3,240','Used this month'],['180','Withdrawn this month'],['0','Open reconciliation variances']].map(x=>`<div class="kpi"><div class="n">${x[0]}</div><div class="l">${x[1]}</div></div>`).join('')}</div>`+
 panel('Quick Actions',`<div class="actions"><button class="btn primary" onclick="receipting()">Open Receipting</button><button class="btn" onclick="usage()">Open Usage</button><button class="btn" onclick="withdrawal()">Open Withdrawal</button><button class="btn" onclick="reports()">Open Reconciliation</button></div>`)+
-panel('Recent Transactions',tbl(['Transaction','Reference','Quantity','Status','Date'],[['Receipting','GR-50001984','5,000','<span class="success">Completed</span>','09/09/2026'],['Usage','PO-4500987123','500','<span class="success">Completed</span>','09/09/2026'],['Withdrawal','OBD-80000321','20','<span class="warning">Pending review</span>','09/08/2026']]))}
+panel('Expiry Alerts',`<div class="expiry-cards">
+<div class="expiry-card c1" onclick="showExpiryDetail(0,7)"><div class="n">${expiryCount(0,7)}</div><div class="l">Expiring in ≤ 7 days</div></div>
+<div class="expiry-card c2" onclick="showExpiryDetail(8,30)"><div class="n">${expiryCount(8,30)}</div><div class="l">Expiring in 8–30 days</div></div>
+<div class="expiry-card c3" onclick="showExpiryDetail(31,90)"><div class="n">${expiryCount(31,90)}</div><div class="l">Expiring in 31–90 days</div></div>
+<div class="expiry-card c4" onclick="showExpiryDetail(0,90)"><div class="n">${expiryCount(0,90)}</div><div class="l">Total Near-Expiry (≤ 90 days)</div></div>
+</div>
+<div class="filterrow"><div><label>Days to expire (≤)</label><input type="number" id="expiryFilterDays" min="0" value="30" style="width:110px"></div><button class="btn primary" onclick="applyExpiryFilter()">Apply Filter</button></div>
+<div id="expiryDetail"></div>`)+
+panel('Recent Transactions',tbl(['Transaction','Reference','Quantity','Status','Date'],[['Receipting','GR-50001984','5,000','<span class="success">Completed</span>','09/09/2026'],['Usage','PO-4500987123','500','<span class="success">Completed</span>','09/09/2026'],['Withdrawal','OBD-80000321','20','<span class="warning">Pending review</span>','09/08/2026']]));
+showExpiryDetail(0,30);
+}
 
 function receipting(){setActive('receipting');main.innerHTML=title('Hologram Receipting','Select an IBD document. Business fields populate from the IBD; serials are captured only by the user.')+
 panel('IBD Document',`<div class="grid">${field('IBD Document *',`<select id="ibd" onchange="fillIBD()"><option value="">Select IBD Document</option>${ibds.map((x,i)=>`<option value="${i}">${x.id}</option>`).join('')}</select>`)}
-${field('Vendor',inp('rv'))}${field('Material',inp('rm'))}${field('Delivery',inp('rd'))}${field('Batch',inp('rb'))}${field('Batch ID',inp('rbi'))}${field('Expected Quantity',inp('rq'))}${field('Expiry',inp('rex'))}</div>`)+
-panel('Serial Capture',`<div class="grid">
-${field('Serial Start *',qrIcon('rs','updateReceiptQty()'))}
-${field('Serial End *',qrIcon('re','updateReceiptQty()'))}
+${field('Vendor',inp('rv'))}${field('Material',inp('rm'))}${field('Delivery',inp('rd'))}${field('Batch',inp('rb'))}
+${field('Batch ID *',`<div class="scan">${inp('rbi','',true)}<button type="button" class="btn" onclick="createBatchIdBTP()">Create Batch ID</button></div><div id="rbiStatus" class="note">Select an IBD document, then click "Create Batch ID" to generate it.</div>`)}
+${field('Expected Quantity',inp('rq'))}${field('Expiry',inp('rex'))}
+${field('Split into Multiple Batches?','<select id="rSplitToggle" onchange="toggleSplitMode()"><option value="No">No — single serial range</option><option value="Yes">Yes — split by line number</option></select>')}
+</div>`)+
+`<div id="singleCapture">`+panel('Serial Capture',`<div class="grid">
+${field('Vendor Code',inp('rscv','',true))}${field('Material Code',inp('rscm','',true))}${field('Batch Number',inp('rscb','',true))}
+${field('Prefix',qrIcon('rpfx',undefined,'',SC_GROUP))}
+${field('Start Hologram No. *',qrIcon('rs','updateReceiptQty()','',SC_GROUP))}
+${field('End Hologram No. *',qrIcon('re','updateReceiptQty()','',SC_GROUP))}
+${field('Suffix',qrIcon('rsfx',undefined,'',SC_GROUP))}
 ${field('Received Quantity *','<input id="rqty" class="auto" readonly value="">')}
-</div><div class="actions"><button class="btn accept" onclick="confirmReceipt()">Confirm Goods Receipt</button><span id="rmsg" class="status">Serial fields are blank until manually entered or scanned. Received quantity is calculated automatically from the serial range.</span></div>`)+
+</div><div class="actions"><button class="btn accept" onclick="confirmReceipt()">Confirm Goods Receipt</button><span id="rmsg" class="status">Serial fields are blank until manually entered or scanned. Received quantity is calculated automatically from the serial range and is checked against the Expected Quantity.</span></div>`)+`</div>`+
+`<section class="panel" id="splitCapturePanel" style="display:none"><div class="panel-title">Batch Split</div><div class="panel-body">
+<div class="tablewrap"><table style="min-width:1180px"><thead><tr><th>#</th><th>Vendor Code</th><th>Material Code</th><th>Batch Roll No.</th><th>Prefix</th><th>Start Hologram No.</th><th>End Hologram No.</th><th>Suffix</th><th>Quantity Received</th><th>Date Received</th><th>Vendor Invoice No.</th><th></th></tr></thead><tbody id="splitLinesBody"></tbody></table></div>
+<div class="linebar"><button type="button" class="btn" onclick="addSplitLine()">+ Add Line</button><span class="totals">Total Quantity Received: <b id="splitTotalQty">0</b> &nbsp;|&nbsp; Expected Quantity (IBD): <b id="splitExpectedQty">0</b></span></div>
+<div class="actions"><button class="btn primary" onclick="saveSplitRecords()">Save Record(s)</button><button class="btn accept" onclick="confirmReceipt()">Confirm Goods Receipt</button><span id="rmsgSplit" class="status">Total quantity received across all lines is checked against the Expected Quantity before posting.</span></div>
+</div></section>`+
 panel('Transaction & SAP Update',tbl(['Transaction','Action','Status'],[['Goods Receipt','Post GR transaction','Pending'],['Receipt Transaction','Record receipt against GR','Pending'],['Stock on Hand','Calculate / update available SOH','Pending'],['Serial Inventory','Update hologram inventory for reporting','Pending']]))}
+const SC_GROUP='{"prefix":"rpfx","start":"rs","end":"re","suffix":"rsfx"}';
 function updateReceiptQty(){document.getElementById('rqty').value=serialQty('rs','re')}
-function fillIBD(){let idx=document.getElementById('ibd').value;if(idx==='')return;let x=ibds[+idx];[['rv',x.vendor],['rm',x.material],['rd',x.delivery],['rb',x.batch],['rbi',x.batchId],['rq',x.qty],['rex',x.expiry]].forEach(a=>document.getElementById(a[0]).value=a[1]);document.getElementById('rs').value='';document.getElementById('re').value='';document.getElementById('rqty').value='';document.getElementById('rmsg').innerHTML='IBD selected — business fields populated. Serial numbers must be manually entered or captured by QR scan.'}
-function confirmReceipt(){if(!document.getElementById('ibd').value)return msg('Please select an IBD document.');if(!rs.value||!re.value||!rqty.value)return msg('Please enter/capture Serial Start, Serial End and Received Quantity.');document.querySelectorAll('#main table tbody tr td:last-child').forEach(x=>x.innerHTML='<span class="success">Completed</span>');document.getElementById('rmsg').innerHTML='<span class="success">Goods Receipt confirmed. SAP posting, receipt transaction and SOH update are simulated.</span>';msg('Goods Receipt confirmed. SAP posting and SOH update are simulated.')}
+function createBatchIdBTP(){let idxEl=document.getElementById('ibd');if(!idxEl||idxEl.value==='')return msg('Please select an IBD document first.');document.getElementById('rbiStatus').innerHTML='Creating Batch ID…';setTimeout(()=>{let base=ibds[+idxEl.value];let newId=base.batchId.replace(/\D/g,'')+String(Math.floor(100+Math.random()*899));document.getElementById('rbi').value=newId;document.getElementById('rbiStatus').innerHTML='<span class="success">Batch ID created ✓ ('+newId+')</span>'},700)}
+function toggleSplitMode(){let v=document.getElementById('rSplitToggle').value;document.getElementById('singleCapture').style.display=v==='Yes'?'none':'block';document.getElementById('splitCapturePanel').style.display=v==='Yes'?'block':'none';if(v==='Yes'&&receiptSplitLines.length===0){addSplitLine();addSplitLine();addSplitLine();addSplitLine();addSplitLine()}}
+function slId(i,field){return 'sl_'+field+'_'+i}
+function addSplitLine(){let idxEl=document.getElementById('ibd');let base=idxEl&&idxEl.value!==''?ibds[+idxEl.value]:null;receiptSplitLines.push({vendorCode:base?base.vendor:'',materialCode:base?base.material:'',batchRoll:base?base.batch:'',prefix:'',start:'',end:'',suffix:'',dateReceived:'',invoice:''});renderSplitLines()}
+function removeSplitLine(i){receiptSplitLines.splice(i,1);renderSplitLines()}
+function updateSplitLine(i,fieldName){let el=document.getElementById(slId(i,fieldName));if(!el)return;receiptSplitLines[i][fieldName]=el.value;if(fieldName==='start'||fieldName==='end'){let qty=qtyFromRange(receiptSplitLines[i].start,receiptSplitLines[i].end);let qtyEl=document.getElementById(slId(i,'qtydisplay'));if(qtyEl)qtyEl.textContent=qty?qty.toLocaleString():'0'}renderSplitTotals()}
+function renderSplitLines(){let rows=receiptSplitLines.map((l,i)=>{let g=JSON.stringify({prefix:slId(i,'prefix'),start:slId(i,'start'),end:slId(i,'end'),suffix:slId(i,'suffix')});return `<tr>
+<td>${i+1}</td>
+<td><input id="${slId(i,'vendorCode')}" value="${l.vendorCode||''}" oninput="updateSplitLine(${i},'vendorCode')" style="width:90px"></td>
+<td><input id="${slId(i,'materialCode')}" value="${l.materialCode||''}" oninput="updateSplitLine(${i},'materialCode')" style="width:120px"></td>
+<td><input id="${slId(i,'batchRoll')}" value="${l.batchRoll||''}" oninput="updateSplitLine(${i},'batchRoll')" style="width:110px"></td>
+<td>${qrIcon(slId(i,'prefix'),`updateSplitLine(${i},'prefix')`,l.prefix,g)}</td>
+<td>${qrIcon(slId(i,'start'),`updateSplitLine(${i},'start')`,l.start,g)}</td>
+<td>${qrIcon(slId(i,'end'),`updateSplitLine(${i},'end')`,l.end,g)}</td>
+<td>${qrIcon(slId(i,'suffix'),`updateSplitLine(${i},'suffix')`,l.suffix,g)}</td>
+<td id="${slId(i,'qtydisplay')}" class="auto" style="font-weight:bold;color:#0b5d95">${(qtyFromRange(l.start,l.end)||0).toLocaleString()}</td>
+<td><input id="${slId(i,'dateReceived')}" type="date" value="${l.dateReceived||''}" oninput="updateSplitLine(${i},'dateReceived')"></td>
+<td><input id="${slId(i,'invoice')}" value="${l.invoice||''}" oninput="updateSplitLine(${i},'invoice')" style="width:90px"></td>
+<td><button type="button" class="btn danger" onclick="removeSplitLine(${i})">Remove</button></td>
+</tr>`}).join('');document.getElementById('splitLinesBody').innerHTML=rows||'<tr><td colspan="11" class="muted">No split lines yet — click "+ Add Line" to begin.</td></tr>';renderSplitTotals()}
+function renderSplitTotals(){let total=receiptSplitLines.reduce((s,l)=>s+qtyFromRange(l.start,l.end),0);let totalEl=document.getElementById('splitTotalQty');if(totalEl)totalEl.textContent=total.toLocaleString()}
+function saveSplitRecords(){let filled=receiptSplitLines.filter(l=>l.start&&l.end);if(!filled.length)return msg('Enter at least one line with Start and End Hologram numbers before saving.');msg(filled.length+' roll record(s) saved (simulated).')}
+function fillIBD(){let idx=document.getElementById('ibd').value;if(idx==='')return;let x=ibds[+idx];[['rv',x.vendor],['rm',x.material],['rd',x.delivery],['rb',x.batch],['rq',x.qty],['rex',x.expiry]].forEach(a=>document.getElementById(a[0]).value=a[1]);document.getElementById('rbi').value='';document.getElementById('rbiStatus').innerHTML='Click "Create Batch ID" to generate it for this IBD.';document.getElementById('rscv').value=x.vendor;document.getElementById('rscm').value=x.material;document.getElementById('rscb').value=x.batch;document.getElementById('rpfx').value='';document.getElementById('rs').value='';document.getElementById('re').value='';document.getElementById('rsfx').value='';document.getElementById('rqty').value='';document.getElementById('rmsg').innerHTML='IBD selected — business fields populated. Serial numbers must be manually entered or captured by QR scan.';receiptSplitLines=[];document.getElementById('rSplitToggle').value='No';toggleSplitMode();let expEl=document.getElementById('splitExpectedQty');if(expEl)expEl.textContent=Number(x.qty).toLocaleString()}
+function finalizeReceipt(){document.querySelectorAll('#main table tbody tr td:last-child').forEach(x=>x.innerHTML='<span class="success">Completed</span>');let m=document.getElementById('rmsg'),ms=document.getElementById('rmsgSplit');if(m)m.innerHTML='<span class="success">Goods Receipt confirmed. SAP posting, receipt transaction and SOH update are simulated.</span>';if(ms)ms.innerHTML='<span class="success">Goods Receipt confirmed for all split lines. SAP posting, receipt transaction and SOH update are simulated.</span>';msg('Goods Receipt confirmed. SAP posting and SOH update are simulated.')}
+function confirmReceipt(){
+if(!document.getElementById('ibd').value)return msg('Please select an IBD document.');
+let expected=Number((document.getElementById('rq').value||'0').toString().replace(/,/g,''))||0;
+let splitMode=document.getElementById('rSplitToggle').value==='Yes';
+if(splitMode){
+let filled=receiptSplitLines.filter(l=>l.start&&l.end);
+if(!filled.length)return msg('Please add at least one batch split line with Start and End Hologram numbers.');
+let total=filled.reduce((s,l)=>s+qtyFromRange(l.start,l.end),0);
+if(expected&&total!==expected){showMismatchModal(`The Expected Quantity from the IBD is <b>${expected.toLocaleString()}</b> but the total Quantity Received across ${filled.length} line(s) is <b>${total.toLocaleString()}</b>. These do not match.`,()=>finalizeReceipt());return}
+finalizeReceipt();
+}else{
+if(!rs.value||!re.value||!rqty.value)return msg('Please enter/capture Start Hologram No., End Hologram No. and Received Quantity.');
+let received=Number(rqty.value)||0;
+if(expected&&received&&expected!==received){showMismatchModal(`The Expected Quantity from the IBD is <b>${expected.toLocaleString()}</b> but the Received Quantity calculated from the serial range is <b>${received.toLocaleString()}</b>. These do not match.`,()=>finalizeReceipt());return}
+finalizeReceipt();
+}
+}
+let receiptSplitLines=[];
+
 
 function usage(){setActive('usage');main.innerHTML=title('Hologram Usage','Select a Production Order and capture hologram serials manually or by QR scan.')+
-panel('Production Order',`<div class="grid">${field('Production Order *','<select id="upo" onchange="fillProductionOrder()"><option value="">Select Production Order</option><option value="0">4500987123</option><option value="1">4500987148</option><option value="2">4500987199</option></select>')}${field('Transaction Date',inp('utd','',true))}${field('Vendor',inp('uv','',true))}${field('FG Material No.',inp('ufgm','',true))}${field('Material Plan',inp('ump','',true))}${field('Order Status',inp('uos','',true))}</div>`)+
-panel('Hologram Serial Capture',`<div class="grid">${field('Serial Start *',qrIcon('ust','updateUsageQty()'))}
-${field('Serial End *',qrIcon('uen','updateUsageQty()'))}
-${field('Quantity to Deduct *','<input id="uq" class="auto" readonly value="">')}</div>
-<div class="stockcalc"><div><div class="cap">Stock on hand (before)</div><div class="val">41,230</div></div><div class="arrow">→</div><div><div class="cap">Quantity to deduct</div><div class="val deduct" id="stockDeduct">-0</div></div><div class="arrow">→</div><div><div class="cap">Stock on hand (after save)</div><div class="val after" id="stockAfter">41,230</div></div></div>
-<div class="actions"><button class="btn accept" onclick="upost()">Post Hologram Usage</button><span id="umsg" class="status">Enter/capture the serials before posting. Quantity to deduct is calculated automatically from the serial range.</span></div>`)+
-panel('Transaction Status',tbl(['Transaction','Action','Status'],[['OData','Trigger SAP integration','Ready'],['Goods Issue','Post GI against Production Order','Pending'],['Hologram Usage','Record usage against selected serials','Pending'],['SOH','Deduct used holograms','Pending'],['Serial Inventory','Update serial status','Pending']]))}
-function fillProductionOrder(){let i=document.getElementById('upo').value;if(i==='')return;let x=productionOrders[+i];[['utd',x.date],['uv',x.vendor],['ufgm',x.fg],['ump',x.plan],['uos',x.status]].forEach(a=>document.getElementById(a[0]).value=a[1]);document.getElementById('ust').value='';document.getElementById('uen').value='';document.getElementById('uq').value='';updateUsageStock()}
-function updateUsageQty(){document.getElementById('uq').value=serialQty('ust','uen');updateUsageStock()}
-function updateUsageStock(){let q=Number(document.getElementById('uq')?.value||0);document.getElementById('stockDeduct').textContent='-'+q.toLocaleString();document.getElementById('stockAfter').textContent=(41230-q).toLocaleString()}
-function upost(){let po=document.getElementById('upo'),s=document.getElementById('ust'),e=document.getElementById('uen'),q=document.getElementById('uq');if(!po.value||!s.value||!e.value||!q.value){return msg('Please select a Production Order and enter/capture Serial Start, Serial End and Quantity.')}document.querySelectorAll('#main table tbody tr td:last-child').forEach(x=>x.innerHTML='<span class="success">Completed</span>');document.getElementById('umsg').innerHTML='<span class="success">Hologram usage posted and SOH updated.</span>';msg('Hologram usage posted. SAP GI and SOH update are simulated.')}
+panel('Production Order',`<div class="grid">${field('Production Order *','<select id="upo" onchange="fillProductionOrder()"><option value="">Select Production Order</option><option value="0">4500987123</option><option value="1">4500987148</option><option value="2">4500987199</option></select>')}${field('Transaction Date',inp('utd','',true))}${field('Vendor Code',inp('uv','',true))}${field('Material Code',inp('umc','',true))}${field('FG VendorCode',inp('ufgv','',true))}${field('FG Material No.',inp('ufgm','',true))}${field('FG Material Batch No.',inp('ufgb','',true))}${field('Material Plan',inp('ump','',true))}${field('Order Status',inp('uos','',true))}
+${field('Attach Approver File','<input type="file" id="uApproverFile" accept="image/*,.pdf,.doc,.docx" onchange="handleApproverFile(this)"><div class="note">Images, Docs or PDF files</div><div id="uApproverFileStatus" class="note">No file chosen</div>')}
+</div>`)+
+`<section class="panel"><div class="panel-title">Production Usage Items</div><div class="panel-body">
+<div class="tablewrap"><table style="min-width:1020px"><thead><tr><th>#</th><th>Batch Roll No.</th><th>Prefix</th><th>Start Hologram No.</th><th>End Hologram No.</th><th>Hologram Suffix</th><th>Quantity</th><th>Status</th><th></th></tr></thead><tbody id="usageLinesBody"></tbody></table></div>
+<div class="linebar"><button type="button" class="btn" onclick="addUsageLine()">+ Add Line</button><span class="totals">Total Quantity to Deduct: <b id="usageLineTotal">0</b></span></div>
+</div></section>`+
+panel('Stock on Hand',`<div class="stockcalc"><div><div class="cap">Stock on hand (before)</div><div class="val">41,230</div></div><div class="arrow">→</div><div><div class="cap">Quantity to deduct</div><div class="val deduct" id="stockDeduct">-0</div></div><div class="arrow">→</div><div><div class="cap">Stock on hand (after save)</div><div class="val after" id="stockAfter">41,230</div></div></div>
+<div class="actions"><button class="btn primary" onclick="saveUsageRecords()">Save Record(s)</button><button class="btn accept" onclick="upost()">Post Hologram Usage</button><span id="umsg" class="status">Enter/capture the serials before posting.</span></div>`)+
+panel('Transaction Status',tbl(['Transaction','Action','Status'],[['OData','Trigger SAP integration','Ready'],['Goods Issue','Post GI against Production Order','Pending'],['Hologram Usage','Record usage against selected serials','Pending'],['SOH','Deduct used holograms','Pending'],['Serial Inventory','Update serial status','Pending']]));
+usageLines=[];addUsageLine();addUsageLine();addUsageLine();addUsageLine();addUsageLine();}
+function handleApproverFile(input){let statusEl=document.getElementById('uApproverFileStatus');if(!input.files||!input.files.length){statusEl.textContent='No file chosen';return}statusEl.textContent=Array.from(input.files).map(f=>f.name).join(', ')}
+function ulId(i,f){return 'ul_'+f+'_'+i}
+function addUsageLine(){usageLines.push({batchRoll:'',prefix:'',start:'',end:'',suffix:'',status:'Pending'});renderUsageLines()}
+function removeUsageLine(i){usageLines.splice(i,1);renderUsageLines()}
+function updateUsageLine(i,fieldName){let el=document.getElementById(ulId(i,fieldName));if(!el)return;usageLines[i][fieldName]=el.value;if(fieldName==='start'||fieldName==='end'){let qty=qtyFromRange(usageLines[i].start,usageLines[i].end);let qtyEl=document.getElementById(ulId(i,'qtydisplay'));if(qtyEl)qtyEl.textContent=qty?qty.toLocaleString():'0'}renderUsageTotals()}
+function renderUsageLines(){let rows=usageLines.map((l,i)=>{let g=JSON.stringify({prefix:ulId(i,'prefix'),start:ulId(i,'start'),end:ulId(i,'end'),suffix:ulId(i,'suffix')});return `<tr>
+<td>${i+1}</td>
+<td><select id="${ulId(i,'batchRoll')}" onchange="updateUsageLine(${i},'batchRoll')"><option value="">Select</option>${batchRollOptions.map(b=>`<option ${l.batchRoll===b?'selected':''}>${b}</option>`).join('')}</select></td>
+<td>${qrIcon(ulId(i,'prefix'),`updateUsageLine(${i},'prefix')`,l.prefix,g)}</td>
+<td>${qrIcon(ulId(i,'start'),`updateUsageLine(${i},'start')`,l.start,g)}</td>
+<td>${qrIcon(ulId(i,'end'),`updateUsageLine(${i},'end')`,l.end,g)}</td>
+<td>${qrIcon(ulId(i,'suffix'),`updateUsageLine(${i},'suffix')`,l.suffix,g)}</td>
+<td id="${ulId(i,'qtydisplay')}" class="auto" style="font-weight:bold;color:#0b5d95">${(qtyFromRange(l.start,l.end)||0).toLocaleString()}</td>
+<td><select id="${ulId(i,'status')}" onchange="updateUsageLine(${i},'status')"><option ${l.status==='Pending'?'selected':''}>Pending</option><option ${l.status==='Ready'?'selected':''}>Ready</option><option ${l.status==='Completed'?'selected':''}>Completed</option></select></td>
+<td><button type="button" class="btn danger" onclick="removeUsageLine(${i})">Remove</button></td>
+</tr>`}).join('');document.getElementById('usageLinesBody').innerHTML=rows||'<tr><td colspan="9" class="muted">No line items yet — click "+ Add Line" to begin.</td></tr>';renderUsageTotals()}
+function renderUsageTotals(){let total=usageLines.reduce((s,l)=>s+qtyFromRange(l.start,l.end),0);let totalEl=document.getElementById('usageLineTotal');if(totalEl)totalEl.textContent=total.toLocaleString();let dEl=document.getElementById('stockDeduct'),aEl=document.getElementById('stockAfter');if(dEl)dEl.textContent='-'+total.toLocaleString();if(aEl)aEl.textContent=(41230-total).toLocaleString()}
+function saveUsageRecords(){let filled=usageLines.filter(l=>l.start&&l.end);if(!filled.length)return msg('Enter at least one line with Start and End Hologram numbers before saving.');msg(filled.length+' production line record(s) saved (simulated).')}
+function fillProductionOrder(){let i=document.getElementById('upo').value;if(i==='')return;let x=productionOrders[+i];[['utd',x.date],['uv',x.vendor],['umc',x.materialCode],['ufgv',x.fgVendor],['ufgm',x.fg],['ufgb',x.fgBatch],['ump',x.plan],['uos',x.status]].forEach(a=>document.getElementById(a[0]).value=a[1]);usageLines=[];addUsageLine();addUsageLine();addUsageLine();addUsageLine();addUsageLine()}
+function upost(){let po=document.getElementById('upo');if(!po.value)return msg('Please select a Production Order.');let filled=usageLines.filter(l=>l.start&&l.end);if(!filled.length)return msg('Please enter/capture at least one line with Start and End Hologram numbers.');document.querySelectorAll('#main table tbody tr td:last-child').forEach(x=>x.innerHTML='<span class="success">Completed</span>');document.getElementById('umsg').innerHTML='<span class="success">Hologram usage posted and SOH updated.</span>';msg('Hologram usage posted. SAP GI and SOH update are simulated.')}
+let usageLines=[];
+const batchRollOptions=['019_260346','019_260345','008_260170','HGM-2026-08','HGM-2026-09'];
 
 function withdrawal(){
 setActive('withdrawal');
-main.innerHTML=title('Hologram Withdrawal','Select the withdrawal reason and vendor, then enter or scan the hologram serial range.')+
+main.innerHTML=title('Hologram Withdrawal','Select the OBD document (or reason and vendor), then capture the hologram line items to withdraw.')+
 panel('Withdrawal Request',`<div class="grid">
+${field('OBD Document (from SAP)','<select id="wobd" onchange="fillObdDocument()"><option value="">Select OBD Document</option>'+obdDocuments.map((x,i)=>`<option value="${i}">${x.id}</option>`).join('')+'</select>')}
 ${field('Reason for Withdrawal *','<select id="wreason"><option value="">Select reason</option><option>Damaged Hologram</option><option>Hologram Near Expiry</option><option>Expired Hologram</option><option>Client Request</option></select>')}
 ${field('Vendor *','<select id="wvendor" onchange="updateWithdrawalVendor()"><option value="">Select vendor</option><option value="41230">100120 - MEGA LIFE SCIENCES SDN BHD</option><option value="12673">100133 - BIOLIFE MEDICAL SDN BHD</option><option value="2303041">100124 - GLAXO SMITHKLINE PHARMACEUTICA</option><option value="191971">100136 - JOHNSON & JOHNSON SDN BHD</option><option value="597786">100158 - PFIZER (MALAYSIA) SDN BHD</option></select>')}
-${field('Serial Start *',qrIcon('ws','updateWithdrawalQty()'))}
-${field('Serial End *',qrIcon('we','updateWithdrawalQty()'))}
-${field('Quantity *','<input id="wq" class="auto" readonly value="">')}
 ${field('Transaction Date',inp('wdate','10/09/2026',true))}
 ${field('Details',inp('wd'))}
-</div>`)+
+</div>
+<div class="note" id="wobdNote"></div>`)+
+`<section class="panel"><div class="panel-title">Withdrawal line items</div><div class="panel-body">
+<div class="tablewrap"><table style="min-width:1020px"><thead><tr><th>#</th><th>Batch Roll No.</th><th>Prefix</th><th>Start Hologram No.</th><th>End Hologram No.</th><th>Hologram Suffix</th><th>Quantity</th><th>Status</th><th></th></tr></thead><tbody id="withdrawLinesBody"></tbody></table></div>
+<div class="linebar"><button type="button" class="btn" onclick="addWithdrawLine()">+ Add Line</button><span class="totals">Total Quantity: <b id="withdrawLineTotal">0</b></span></div>
+</div></section>`+
+panel('Attach Images',`<div class="grid"><div>${field('Attach Images','<input type="file" id="wImages" accept="image/*" multiple onchange="handleWithdrawAttachments(this)"><div class="note">Photos of damaged/expired holograms, packaging, etc.</div>')}</div></div>
+<div id="attachList" class="attach-list"></div>`)+
 panel('Stock in Hand',`<div class="stockcalc">
 <div><div class="cap">Vendor stock on hand (before)</div><div class="val" id="withdrawBefore">0</div></div>
 <div class="arrow">→</div>
@@ -215,7 +378,7 @@ panel('Review & Confirmation',`<div class="grid">
 ${field('PM Admin Inspection','<select id="winspect"><option>Visually inspected / reviewed</option><option>Not yet reviewed</option></select>')}
 ${field('Expiry Check','<select id="wexpiry"><option>Within policy threshold</option><option>Expired</option><option>Not applicable</option></select>')}
 </div>
-<div class="actions"><button type="button" class="btn accept" onclick="wpost()">Record Withdrawal & Update SAP</button><span id="wmsg" class="status">Enter the required information and serial range.</span></div>`)+
+<div class="actions"><button type="button" class="btn primary" onclick="saveWithdrawRecords()">Save Record(s)</button><button type="button" class="btn accept" onclick="wpost()">Record Withdrawal & Update SAP</button><span id="wmsg" class="status">Enter the required information and line items.</span></div>`)+
 panel('Transaction Status',tbl(['Transaction','Action','Status'],[
 ['OBD','Trigger OBD request','Pending'],
 ['Withdrawal','Record withdrawal against selected serials','Pending'],
@@ -223,52 +386,85 @@ panel('Transaction Status',tbl(['Transaction','Action','Status'],[
 ['Serial Inventory','Update withdrawal status','Pending']
 ]))+
 `<div class="note">Serial numbers are captured only by manual entry or QR scan. Selecting a reason or vendor never fills the serial fields automatically.</div>`;
+withdrawLines=[];addWithdrawLine();addWithdrawLine();addWithdrawLine();addWithdrawLine();addWithdrawLine();
+withdrawAttachments=[];renderAttachments();
 updateWithdrawalVendor();
 }
+function fillObdDocument(){let idxEl=document.getElementById('wobd');if(!idxEl||idxEl.value==='')return;let x=obdDocuments[+idxEl.value];document.getElementById('wvendor').value=x.vendorCode;document.getElementById('wdate').value=x.date;document.getElementById('wd').value=x.details;updateWithdrawalVendor()}
+function handleWithdrawAttachments(input){if(!input.files||!input.files.length)return;Array.from(input.files).forEach(f=>{let reader=new FileReader();reader.onload=e=>{withdrawAttachments.push({name:f.name,dataUrl:e.target.result});renderAttachments()};reader.readAsDataURL(f)});input.value=''}
+function removeAttachment(i){withdrawAttachments.splice(i,1);renderAttachments()}
+function renderAttachments(){let el=document.getElementById('attachList');if(!el)return;el.innerHTML=withdrawAttachments.map((a,i)=>`<div class="attach-thumb"><img src="${a.dataUrl}" alt="${a.name}"><span class="fname">${a.name}</span><button type="button" title="Remove" onclick="removeAttachment(${i})">✕</button></div>`).join('')||'<div class="note">No images attached.</div>'}
+function wlId(i,f){return 'wl_'+f+'_'+i}
+function addWithdrawLine(){withdrawLines.push({batchRoll:'',prefix:'',start:'',end:'',suffix:'',status:'Pending'});renderWithdrawLines()}
+function removeWithdrawLine(i){withdrawLines.splice(i,1);renderWithdrawLines()}
+function updateWithdrawLine(i,fieldName){let el=document.getElementById(wlId(i,fieldName));if(!el)return;withdrawLines[i][fieldName]=el.value;if(fieldName==='start'||fieldName==='end'){let qty=qtyFromRange(withdrawLines[i].start,withdrawLines[i].end);let qtyEl=document.getElementById(wlId(i,'qtydisplay'));if(qtyEl)qtyEl.textContent=qty?qty.toLocaleString():'0'}renderWithdrawTotals()}
+function renderWithdrawLines(){let rows=withdrawLines.map((l,i)=>{let g=JSON.stringify({prefix:wlId(i,'prefix'),start:wlId(i,'start'),end:wlId(i,'end'),suffix:wlId(i,'suffix')});return `<tr>
+<td>${i+1}</td>
+<td><select id="${wlId(i,'batchRoll')}" onchange="updateWithdrawLine(${i},'batchRoll')"><option value="">Select</option>${batchRollOptions.map(b=>`<option ${l.batchRoll===b?'selected':''}>${b}</option>`).join('')}</select></td>
+<td>${qrIcon(wlId(i,'prefix'),`updateWithdrawLine(${i},'prefix')`,l.prefix,g)}</td>
+<td>${qrIcon(wlId(i,'start'),`updateWithdrawLine(${i},'start')`,l.start,g)}</td>
+<td>${qrIcon(wlId(i,'end'),`updateWithdrawLine(${i},'end')`,l.end,g)}</td>
+<td>${qrIcon(wlId(i,'suffix'),`updateWithdrawLine(${i},'suffix')`,l.suffix,g)}</td>
+<td id="${wlId(i,'qtydisplay')}" class="auto" style="font-weight:bold;color:#0b5d95">${(qtyFromRange(l.start,l.end)||0).toLocaleString()}</td>
+<td><select id="${wlId(i,'status')}" onchange="updateWithdrawLine(${i},'status')"><option ${l.status==='Pending'?'selected':''}>Pending</option><option ${l.status==='Ready'?'selected':''}>Ready</option><option ${l.status==='Completed'?'selected':''}>Completed</option></select></td>
+<td><button type="button" class="btn danger" onclick="removeWithdrawLine(${i})">Remove</button></td>
+</tr>`}).join('');document.getElementById('withdrawLinesBody').innerHTML=rows||'<tr><td colspan="9" class="muted">No line items yet — click "+ Add Line" to begin.</td></tr>';renderWithdrawTotals()}
+function renderWithdrawTotals(){let total=withdrawLines.reduce((s,l)=>s+qtyFromRange(l.start,l.end),0);let totalEl=document.getElementById('withdrawLineTotal');if(totalEl)totalEl.textContent=total.toLocaleString();updateWithdrawalVendor()}
+function saveWithdrawRecords(){let filled=withdrawLines.filter(l=>l.start&&l.end);if(!filled.length)return msg('Enter at least one line with Start and End Hologram numbers before saving.');msg(filled.length+' withdrawal line record(s) saved (simulated).')}
 function updateWithdrawalVendor(){
 let v=Number(document.getElementById('wvendor')?.value||0);
 let before=document.getElementById('withdrawBefore');
 let after=document.getElementById('withdrawAfter');
 let deduct=document.getElementById('withdrawDeduct');
 if(!before||!after||!deduct)return;
-let q=Number(document.getElementById('wq')?.value||0);
+let q=(typeof withdrawLines!=='undefined'?withdrawLines:[]).reduce((s,l)=>s+qtyFromRange(l.start,l.end),0);
 before.textContent=v.toLocaleString();
 deduct.textContent='-'+q.toLocaleString();
 after.textContent=Math.max(0,v-q).toLocaleString();
 }
-function updateWithdrawalStock(){updateWithdrawalVendor()}
-function updateWithdrawalQty(){document.getElementById('wq').value=serialQty('ws','we');updateWithdrawalStock()}
 function wpost(){
-let reason=document.getElementById('wreason'),vendor=document.getElementById('wvendor'),s=document.getElementById('ws'),e=document.getElementById('we'),q=document.getElementById('wq');
-if(!reason.value||!vendor.value||!s.value||!e.value||!q.value||Number(q.value)<=0){return msg('Please complete Reason, Vendor, Serial Start, Serial End and Quantity.')}
-let before=Number(vendor.value),qty=Number(q.value);
+let reason=document.getElementById('wreason'),vendor=document.getElementById('wvendor');
+let filled=withdrawLines.filter(l=>l.start&&l.end);
+if(!reason.value||!vendor.value||!filled.length){return msg('Please complete Reason, Vendor and at least one line item with Start and End Hologram numbers.')}
+let before=Number(vendor.value),qty=filled.reduce((s,l)=>s+qtyFromRange(l.start,l.end),0);
+if(qty<=0)return msg('Total withdrawal quantity must be greater than zero.');
 if(qty>before){return msg('Quantity to deduct cannot be greater than vendor stock on hand.')}
-updateWithdrawalStock();
+updateWithdrawalVendor();
 document.querySelectorAll('#main table tbody tr td:last-child').forEach(x=>x.innerHTML='<span class="success">Completed</span>');
 document.getElementById('wmsg').innerHTML='<span class="success">Withdrawal recorded. OBD, SAP withdrawal and SOH update are simulated.</span>';
 msg('Withdrawal recorded successfully. No validation step is required.');
 }
-function updateWithdrawalStock(){let q=Number(document.getElementById('wq')?.value||0);document.getElementById('withdrawDeduct').textContent='-'+q.toLocaleString();document.getElementById('withdrawAfter').textContent=(41230-q).toLocaleString()}
+let withdrawLines=[];
+let withdrawAttachments=[];
+
 function inquiry(){setActive('inquiry');main.innerHTML=title('Hologram Inquiry','Select a serial number, vendor and status to view hologram status and transaction history.')+
-panel('Inquiry Criteria',`<div class="grid">${field('Serial Number *','<select id="qserial"><option value="">Select Serial Number</option><option value="0">000000310485001</option><option value="1">000000310485101</option><option value="2">000000310485201</option><option value="3">000000310485301</option></select>')}${field('Vendor','<select id="qvendor"><option value="All">All Vendors</option><option value="GSK">100124 - GLAXO SMITHKLINE PHARMACEUTICA</option><option value="ZP">Zuellig Pharma Sdn Bhd</option></select>')}${field('Status','<select id="qstatus"><option value="All">All</option><option>Available</option><option>Used</option><option>Withdrawn</option></select>')} ${field('','<button class="btn primary" onclick="viewInquiry()">View Status & History</button>')}</div>`)+
-`<div id="inquiryResult">${panel('Hologram Serial Status','<div class="muted">Select the serial number, vendor and status, then click View Status & History.</div>')}</div>`}
+panel('Inquiry Criteria',`<div class="grid">${field('Serial Number *','<select id="qserial"><option value="">Select Serial Number</option><option value="0">000000310485001</option><option value="1">000000310485101</option><option value="2">000000310485201</option><option value="3">000000310485301</option></select>')}${field('Vendor','<select id="qvendor"><option value="All">All Vendors</option><option value="GSK">100124 - GLAXO SMITHKLINE PHARMACEUTICA</option><option value="ZP">Zuellig Pharma Sdn Bhd</option></select>')}${field('Status','<select id="qstatus"><option value="All">All</option><option>Available</option><option>Used</option><option>Withdrawn</option></select>')} ${field('','<button class="btn primary" onclick="viewInquiry()">View Status & History</button>')}</div>
+<div class="note">Or look up all holograms tagged to a batch:</div>
+<div class="grid" style="margin-top:6px">${field('Batch Number','<input id="qbatch" placeholder="e.g. HGM-2026-09 or 019_260346">')}${field('','<button class="btn" onclick="searchByBatch()">Search by Batch</button>')}</div>
+<div class="note">Or search a specific vendor between a Start Date and a Receiving Date:</div>
+<div class="grid" style="margin-top:6px">${field('Vendor','<select id="qdrvendor"><option value="All">All Vendors</option>'+[...new Set(hologramRegistry.map(x=>x.vendor))].map(v=>`<option>${v}</option>`).join('')+'</select>')}${field('Start Date','<input id="qstartdate" type="date">')}${field('Receiving Date','<input id="qrecdate2" type="date">')}${field('','<button class="btn" onclick="searchByVendorDateRange()">Search</button>')}</div>`)+
+`<div id="inquiryResult">${panel('Hologram Serial Status','<div class="muted">Select the serial number, vendor and status, then click View Status & History — or search by Batch Number, or Vendor + Date Range.</div>')}</div>`}
+function searchByBatch(){let b=(document.getElementById('qbatch').value||'').trim();if(!b)return msg('Enter a batch number to search.');let rows=hologramRegistry.filter(x=>x.batch.toLowerCase()===b.toLowerCase());renderRegistryResults('Holograms in Batch '+b,rows)}
+function searchByVendorDateRange(){let vendor=document.getElementById('qdrvendor').value;let start=document.getElementById('qstartdate').value;let end=document.getElementById('qrecdate2').value;if(!start&&!end)return msg('Enter a Start Date and/or Receiving Date to search.');let rows=hologramRegistry.filter(x=>{if(vendor!=='All'&&x.vendor!==vendor)return false;if(start&&x.receivingDate<start)return false;if(end&&x.receivingDate>end)return false;return true});let heading='Holograms'+(vendor!=='All'?' for '+vendor:'')+' ('+(start||'…')+' to '+(end||'…')+')';renderRegistryResults(heading,rows)}
+function renderRegistryResults(headingText,rows){let el=document.getElementById('inquiryResult');if(!rows.length){el.innerHTML=panel(headingText,'<div class="muted">No matching hologram records found.</div>');return}el.innerHTML=panel(headingText,tbl(['Serial Number','Batch','Vendor','Material','Quantity','Receiving Date','Expiry Date','Status'],rows.map(x=>[x.serial,x.batch,x.vendor,x.material,x.qty.toLocaleString(),x.receivingDate,x.expiry,`<span class="${x.status==='Available'?'success':x.status==='Withdrawn'?'warning':''}">${x.status}</span>`])))}
 function viewInquiry(){let i=document.getElementById('qserial').value;if(i==='')return msg('Please select a serial number.');let x=inquiryData[+i];let v=document.getElementById('qvendor').value;let st=document.getElementById('qstatus').value;if(v!=='All'&&v!==x.vendorType)return msg('Selected vendor does not match this serial.');if(st!=='All'&&st!==x.status)return msg('Selected status does not match this serial.');document.getElementById('inquiryResult').innerHTML=panel('Hologram Serial Status',`<div class="grid">${field('Serial Number',inp('dserial',x.serial,true))}${field('Vendor',inp('dvendor',x.vendor,true))}${field('Status',`<span class="status ${x.status==='Available'?'success':x.status==='Withdrawn'?'warning':''}">${x.status}</span>`)}${field('Material Code',inp('dmat',x.material,true))}${field('Batch Roll No.',inp('dbatch',x.batch,true))}${field('Last Transaction',inp('dlast',x.last,true))}</div>`)+panel('Transaction History',tbl(['Date','Transaction','Reference','Quantity','Status'],x.history))}
 function reports(){setActive('reports');main.innerHTML=`
 <div class="bar">Report Criteria</div>
 <section class="report-criteria"><div class="report-grid">
 <div><label>Report type</label><select id="rptype"><option>Summary</option><option>Receiving</option><option>Usage</option><option>Withdrawal</option></select></div>
 <div><label>Vendor</label><select id="rvendor" onchange="renderReportSummary()"><option value="All">All vendors</option><option value="100120">100120 - MEGA LIFE SCIENCES SDN BHD</option><option value="100133">100133 - BIOLIFE MEDICAL SDN BHD</option><option value="100124">100124 - GLAXO SMITHKLINE PHARMACEUTICA</option><option value="100136">100136 - JOHNSON & JOHNSON SDN BHD</option><option value="100158">100158 - PFIZER (MALAYSIA) SDN BHD</option></select></div>
-<div><label>Period (last date)</label><input id="rdate" type="date" value="2026-05-31"></div>
+<div><label>Start Date</label><input id="rsdate" type="date" value="2026-05-01"></div>
+<div><label>End Date</label><input id="rdate" type="date" value="2026-05-31"></div>
 <div><label>Export format</label><select id="rexport"><option value="csv">Excel (CSV)</option><option value="pdf">PDF</option></select></div>
 <div class="report-actions"><button class="btn" onclick="openScheduler()">Scheduler</button><button class="btn" onclick="previewReport()">Preview</button><button class="btn" onclick="exportReport()">Export</button></div>
 </div></section>
 <div class="redbar">HOLOGRAM REPORT — SUMMARY</div><div id="reportSummary"></div>`;renderReportSummary()}
 function reportRows(){return[['100120','MEGA LIFE SCIENCES SDN BHD','41,230','0','0','33,333','7,897','Matched'],['100133','BIOLIFE MEDICAL SDN BHD','12,673','0','0','0','12,673','Matched'],['100124','GLAXO SMITHKLINE PHARMACEUTICA','2,303,041','0','0','0','2,303,041','Matched'],['100136','JOHNSON & JOHNSON SDN BHD','191,971','0','0','0','191,971','Matched'],['100158','PFIZER (MALAYSIA) SDN BHD','597,786','0','0','0','597,786','Matched']]}
-function renderReportSummary(){let vendor=document.getElementById('rvendor')?.value||'All';let rows=reportRows().filter(r=>vendor==='All'||r[0]===vendor);document.getElementById('reportSummary').innerHTML=table(['Vendor code','Vendor name','Opening bal.','Receipts','Usage','Withdrawal','Closing bal.','SAP sync'],rows.map(r=>[r[0],r[1],r[2],r[3],r[4],r[5],`<b>${r[6]}</b>`,`<span class="success">● ${r[7]}</span>`]))}
-function previewReport(){let vendor=document.getElementById('rvendor').value;let date=document.getElementById('rdate').value;let rows=reportRows().filter(r=>vendor==='All'||r[0]===vendor);let hr=rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('');document.getElementById('previewContent').innerHTML=`<h2>HOLOGRAM REPORT — SUMMARY</h2><p><b>Vendor:</b> ${vendor==='All'?'All vendors':vendor} &nbsp; <b>Period:</b> ${date}</p><table><thead><tr>${['Vendor code','Vendor name','Opening bal.','Receipts','Usage','Withdrawal','Closing bal.','SAP sync'].map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${hr}</tbody></table>`;document.getElementById('previewModal').style.display='flex'}
+function renderReportSummary(){let vendor=document.getElementById('rvendor')?.value||'All';let rows=reportRows().filter(r=>vendor==='All'||r[0]===vendor);document.getElementById('reportSummary').innerHTML=tbl(['Vendor code','Vendor name','Opening bal.','Receipts','Usage','Withdrawal','Closing bal.','SAP sync'],rows.map(r=>[r[0],r[1],r[2],r[3],r[4],r[5],`<b>${r[6]}</b>`,`<span class="success">● ${r[7]}</span>`]))}
+function previewReport(){let vendor=document.getElementById('rvendor').value;let sdate=document.getElementById('rsdate').value;let date=document.getElementById('rdate').value;let rows=reportRows().filter(r=>vendor==='All'||r[0]===vendor);let hr=rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('');document.getElementById('previewContent').innerHTML=`<h2>HOLOGRAM REPORT — SUMMARY</h2><p><b>Vendor:</b> ${vendor==='All'?'All vendors':vendor} &nbsp; <b>Period:</b> ${sdate} to ${date}</p><table><thead><tr>${['Vendor code','Vendor name','Opening bal.','Receipts','Usage','Withdrawal','Closing bal.','SAP sync'].map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${hr}</tbody></table>`;document.getElementById('previewModal').style.display='flex'}
 function exportReport(){document.getElementById('rexport').value==='csv'?exportCSV():exportPDF()}
 function exportCSV(){let vendor=document.getElementById('rvendor').value;let rows=reportRows().filter(r=>vendor==='All'||r[0]===vendor);let data=[['Vendor code','Vendor name','Opening bal.','Receipts','Usage','Withdrawal','Closing bal.','SAP sync'],...rows];let csv=data.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\\r\\n');downloadBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}),'Hologram_Summary_Report.csv')}
-function exportPDF(){let vendor=document.getElementById('rvendor').value;let date=document.getElementById('rdate').value;let rows=reportRows().filter(r=>vendor==='All'||r[0]===vendor);let lines=['HOLOGRAM REPORT - SUMMARY','Vendor: '+(vendor==='All'?'All vendors':vendor),'Period: '+date,'','Vendor | Vendor name | Opening | Receipts | Usage | Withdrawal | Closing | SAP sync'];rows.forEach(r=>lines.push(r.join(' | ')));downloadBlob(makeSimplePDF(lines),'Hologram_Summary_Report.pdf')}
+function exportPDF(){let vendor=document.getElementById('rvendor').value;let sdate=document.getElementById('rsdate').value;let date=document.getElementById('rdate').value;let rows=reportRows().filter(r=>vendor==='All'||r[0]===vendor);let lines=['HOLOGRAM REPORT - SUMMARY','Vendor: '+(vendor==='All'?'All vendors':vendor),'Period: '+sdate+' to '+date,'','Vendor | Vendor name | Opening | Receipts | Usage | Withdrawal | Closing | SAP sync'];rows.forEach(r=>lines.push(r.join(' | ')));downloadBlob(makeSimplePDF(lines),'Hologram_Summary_Report.pdf')}
 function makeSimplePDF(lines){let esc=s=>s.replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');let c='BT\\n/F1 9 Tf\\n40 800 Td\\n';lines.forEach((l,i)=>{if(i)c+='0 -16 Td\\n';c+='('+esc(l.slice(0,120))+') Tj\\n'});c+='ET';let o=['<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids [3 0 R] /Count 1 >>','<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',`<< /Length ${c.length} >>\\nstream\\n${c}\\nendstream`];let p='%PDF-1.4\\n',off=[0];o.forEach((v,i)=>{off[i+1]=p.length;p+=(i+1)+' 0 obj\\n'+v+'\\nendobj\\n'});let x=p.length;p+='xref\\n0 '+(o.length+1)+'\\n0000000000 65535 f \\n';for(let i=1;i<=o.length;i++)p+=String(off[i]).padStart(10,'0')+' 00000 n \\n';p+='trailer\\n<< /Size '+(o.length+1)+' /Root 1 0 R >>\\nstartxref\\n'+x+'\\n%%EOF';return new Blob([p],{type:'application/pdf'})}
 function downloadBlob(blob,name){let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},100)}
 function openScheduler(){msg('Scheduler is represented in this browser prototype.')}
@@ -305,14 +501,22 @@ panel('Prototype Information','<div class="status">Standalone browser prototype.
 function vendor(){setActive('vendor');main.innerHTML=title('Vendor Profile','Vendor master information used for hologram operations.')+panel('Zuellig Pharma Sdn Bhd',`<div class="grid">${field('Vendor Code',inp('vc','ZP001',true))}${field('Vendor Name',inp('vn','Zuellig Pharma Sdn Bhd',true))}${field('Country',inp('vco','Malaysia',true))}${field('Status','<span class="success">● Active</span>')}${field('Contact Email',inp('ve','operations@zuelligpharma.com',true))}${field('SAP Supplier',inp('vs','1000001458',true))}</div>`)}
 
 const productionOrders=[
-{id:'4500987123',date:'08/09/2026',vendor:'100124 - GLAXO SMITHKLINE PHARMACEUTICA',fg:'FG-31084472',plan:'Plan 500 units',status:'Released'},
-{id:'4500987148',date:'09/09/2026',vendor:'100133 - BIOLIFE MEDICAL SDN BHD',fg:'FG-31084473',plan:'Plan 250 units',status:'In Production'},
-{id:'4500987199',date:'10/09/2026',vendor:'100158 - PFIZER (MALAYSIA) SDN BHD',fg:'FG-31084474',plan:'Plan 1,000 units',status:'Created'}];
+{id:'4500987123',date:'08/09/2026',vendor:'100124 - GLAXO SMITHKLINE PHARMACEUTICA',materialCode:'31084472',fg:'FG-31084472',fgVendor:'100124',fgBatch:'FGB-31084472-08',fgHologram:'FGH-260815-A',plan:'Plan 500 units',status:'Released'},
+{id:'4500987148',date:'09/09/2026',vendor:'100133 - BIOLIFE MEDICAL SDN BHD',materialCode:'31084473',fg:'FG-31084473',fgVendor:'100133',fgBatch:'FGB-31084473-09',fgHologram:'FGH-260903-B',plan:'Plan 250 units',status:'In Production'},
+{id:'4500987199',date:'10/09/2026',vendor:'100158 - PFIZER (MALAYSIA) SDN BHD',materialCode:'31084474',fg:'FG-31084474',fgVendor:'100158',fgBatch:'FGB-31084474-09',fgHologram:'FGH-260909-C',plan:'Plan 1,000 units',status:'Created'}];
 const inquiryData=[
 {serial:'000000310485001',vendor:'100124 - GLAXO SMITHKLINE PHARMACEUTICA',vendorType:'GSK',status:'Available',material:'31084472',batch:'008_260170',last:'Roll Receipt / GR-50001984',history:[['29/08/2026','Roll Receipt','GR-50001984','15,000','Available']]},
 {serial:'000000310485101',vendor:'100124 - GLAXO SMITHKLINE PHARMACEUTICA',vendorType:'GSK',status:'Used',material:'31084472',batch:'008_260170',last:'Usage / PO-4500987123',history:[['29/08/2026','Roll Receipt','GR-50001984','15,000','Available'],['09/09/2026','Hologram Usage','PO-4500987123','500','Used']]},
 {serial:'000000310485201',vendor:'Zuellig Pharma Sdn Bhd',vendorType:'ZP',status:'Withdrawn',material:'HGM-001',batch:'HGM-2026-08',last:'Withdrawal / OBD-80000321',history:[['01/09/2026','Roll Receipt','GR-50001984','5,000','Available'],['08/09/2026','Withdrawal','OBD-80000321','20','Withdrawn']]},
 {serial:'000000310485301',vendor:'Zuellig Pharma Sdn Bhd',vendorType:'ZP',status:'Available',material:'HGM-002',batch:'HGM-2026-09',last:'Roll Receipt / GR-50002001',history:[['03/09/2026','Roll Receipt','GR-50002001','3,000','Available']]}];
+const hologramRegistry=[
+{serial:'000000310485001',batch:'008_260170',vendor:'100124 - GLAXO SMITHKLINE PHARMACEUTICA',material:'31084472',qty:15000,receivingDate:'2026-08-29',expiry:'2027-08-29',status:'Available'},
+{serial:'000000310485101',batch:'008_260170',vendor:'100124 - GLAXO SMITHKLINE PHARMACEUTICA',material:'31084472',qty:500,receivingDate:'2026-08-29',expiry:'2027-08-29',status:'Used'},
+{serial:'000000310485201',batch:'HGM-2026-08',vendor:'Zuellig Pharma Sdn Bhd',material:'HGM-001',qty:20,receivingDate:'2026-09-01',expiry:'2027-08-15',status:'Withdrawn'},
+{serial:'000000310485301',batch:'HGM-2026-09',vendor:'Zuellig Pharma Sdn Bhd',material:'HGM-002',qty:3000,receivingDate:'2026-09-03',expiry:'2027-09-03',status:'Available'},
+{serial:'000000310485320',batch:'HGM-2026-09',vendor:'Zuellig Pharma Sdn Bhd',material:'HGM-002',qty:1500,receivingDate:'2026-09-03',expiry:'2027-09-03',status:'Available'},
+{serial:'000000121515001',batch:'019_260346',vendor:'100249 - RECKITT BENCKISER (M) SDN BHD',material:'31081075',qty:15000,receivingDate:'2026-08-29',expiry:'2027-08-29',status:'Available'}
+];
 
 dashboard();
 </script>
