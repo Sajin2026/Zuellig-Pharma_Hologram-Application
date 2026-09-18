@@ -235,7 +235,6 @@ function tbl(h,rows){return `<div class="tablewrap"><table><thead><tr>${h.map(x=
 
 function dashboard(){setActive('dashboard');main.innerHTML=title('Hologram Serial Number Management','PM Admin dashboard')+
 `<div class="kpis">${[['18,450','Stock on Hand (SOH)'],['5,000','Receipted this month'],['3,240','Used this month'],['180','Withdrawn this month'],['0','Open reconciliation variances']].map(x=>`<div class="kpi"><div class="n">${x[0]}</div><div class="l">${x[1]}</div></div>`).join('')}</div>`+
-panel('Quick Actions',`<div class="actions"><button class="btn primary" onclick="receipting()">Open Receipting</button><button class="btn" onclick="usage()">Open Usage</button><button class="btn" onclick="withdrawal()">Open Withdrawal</button><button class="btn" onclick="reports()">Open Reconciliation</button></div>`)+
 panel('Expiry Alerts',`<div class="expiry-cards">
 <div class="expiry-card c1" onclick="showExpiryDetail(0,7)"><div class="n">${expiryCount(0,7)}</div><div class="l">Expiring in ≤ 7 days</div></div>
 <div class="expiry-card c2" onclick="showExpiryDetail(8,30)"><div class="n">${expiryCount(8,30)}</div><div class="l">Expiring in 8–30 days</div></div>
@@ -257,10 +256,10 @@ ${field('Split into Multiple Batches?','<select id="rSplitToggle" onchange="togg
 </div>`)+
 `<div id="singleCapture">`+panel('Serial Capture',`<div class="grid">
 ${field('Vendor Code',inp('rscv','',true))}${field('Material Code',inp('rscm','',true))}${field('Batch Number',inp('rscb','',true))}
-${field('Prefix',qrIcon('rpfx',undefined,'',SC_GROUP))}
+${field('Prefix','<input id="rpfx" value="">')}
 ${field('Start Hologram No. *',qrIcon('rs','updateReceiptQty()','',SC_GROUP))}
 ${field('End Hologram No. *',qrIcon('re','updateReceiptQty()','',SC_GROUP))}
-${field('Suffix',qrIcon('rsfx',undefined,'',SC_GROUP))}
+${field('Suffix','<input id="rsfx" value="">')}
 ${field('Received Quantity *','<input id="rqty" class="auto" readonly value="">')}
 </div><div class="actions"><button class="btn accept" onclick="confirmReceipt()">Confirm Goods Receipt</button><span id="rmsg" class="status">Serial fields are blank until manually entered or scanned. Received quantity is calculated automatically from the serial range and is checked against the Expected Quantity.</span></div>`)+`</div>`+
 `<section class="panel" id="splitCapturePanel" style="display:none"><div class="panel-title">Batch Split</div><div class="panel-body">
@@ -282,10 +281,10 @@ function renderSplitLines(){let rows=receiptSplitLines.map((l,i)=>{let g=JSON.st
 <td><input id="${slId(i,'vendorCode')}" value="${l.vendorCode||''}" oninput="updateSplitLine(${i},'vendorCode')" style="width:90px"></td>
 <td><input id="${slId(i,'materialCode')}" value="${l.materialCode||''}" oninput="updateSplitLine(${i},'materialCode')" style="width:120px"></td>
 <td><input id="${slId(i,'batchRoll')}" value="${l.batchRoll||''}" oninput="updateSplitLine(${i},'batchRoll')" style="width:110px"></td>
-<td>${qrIcon(slId(i,'prefix'),`updateSplitLine(${i},'prefix')`,l.prefix,g)}</td>
+<td><input id="${slId(i,'prefix')}" value="${l.prefix||''}" oninput="updateSplitLine(${i},'prefix')" style="width:55px"></td>
 <td>${qrIcon(slId(i,'start'),`updateSplitLine(${i},'start')`,l.start,g)}</td>
 <td>${qrIcon(slId(i,'end'),`updateSplitLine(${i},'end')`,l.end,g)}</td>
-<td>${qrIcon(slId(i,'suffix'),`updateSplitLine(${i},'suffix')`,l.suffix,g)}</td>
+<td><input id="${slId(i,'suffix')}" value="${l.suffix||''}" oninput="updateSplitLine(${i},'suffix')" style="width:55px"></td>
 <td id="${slId(i,'qtydisplay')}" class="auto" style="font-weight:bold;color:#0b5d95">${(qtyFromRange(l.start,l.end)||0).toLocaleString()}</td>
 <td><input id="${slId(i,'dateReceived')}" type="date" value="${l.dateReceived||''}" oninput="updateSplitLine(${i},'dateReceived')"></td>
 <td><input id="${slId(i,'invoice')}" value="${l.invoice||''}" oninput="updateSplitLine(${i},'invoice')" style="width:90px"></td>
@@ -329,18 +328,18 @@ panel('Transaction Status',tbl(['Transaction','Action','Status'],[['OData','Trig
 usageLines=[];addUsageLine();addUsageLine();addUsageLine();addUsageLine();addUsageLine();}
 function handleApproverFile(input){let statusEl=document.getElementById('uApproverFileStatus');if(!input.files||!input.files.length){statusEl.textContent='No file chosen';return}statusEl.textContent=Array.from(input.files).map(f=>f.name).join(', ')}
 function ulId(i,f){return 'ul_'+f+'_'+i}
-function addUsageLine(){usageLines.push({batchRoll:'',prefix:'',start:'',end:'',suffix:'',status:'Pending'});renderUsageLines()}
+function addUsageLine(){usageLines.push({batchRoll:'',prefix:'',start:'',end:'',suffix:'',status:'Exhibit'});renderUsageLines()}
 function removeUsageLine(i){usageLines.splice(i,1);renderUsageLines()}
 function updateUsageLine(i,fieldName){let el=document.getElementById(ulId(i,fieldName));if(!el)return;usageLines[i][fieldName]=el.value;if(fieldName==='start'||fieldName==='end'){let qty=qtyFromRange(usageLines[i].start,usageLines[i].end);let qtyEl=document.getElementById(ulId(i,'qtydisplay'));if(qtyEl)qtyEl.textContent=qty?qty.toLocaleString():'0'}renderUsageTotals()}
 function renderUsageLines(){let rows=usageLines.map((l,i)=>{let g=JSON.stringify({prefix:ulId(i,'prefix'),start:ulId(i,'start'),end:ulId(i,'end'),suffix:ulId(i,'suffix')});return `<tr>
 <td>${i+1}</td>
 <td><select id="${ulId(i,'batchRoll')}" onchange="updateUsageLine(${i},'batchRoll')"><option value="">Select</option>${batchRollOptions.map(b=>`<option ${l.batchRoll===b?'selected':''}>${b}</option>`).join('')}</select></td>
-<td>${qrIcon(ulId(i,'prefix'),`updateUsageLine(${i},'prefix')`,l.prefix,g)}</td>
+<td><input id="${ulId(i,'prefix')}" value="${l.prefix||''}" oninput="updateUsageLine(${i},'prefix')" style="width:55px"></td>
 <td>${qrIcon(ulId(i,'start'),`updateUsageLine(${i},'start')`,l.start,g)}</td>
 <td>${qrIcon(ulId(i,'end'),`updateUsageLine(${i},'end')`,l.end,g)}</td>
-<td>${qrIcon(ulId(i,'suffix'),`updateUsageLine(${i},'suffix')`,l.suffix,g)}</td>
+<td><input id="${ulId(i,'suffix')}" value="${l.suffix||''}" oninput="updateUsageLine(${i},'suffix')" style="width:55px"></td>
 <td id="${ulId(i,'qtydisplay')}" class="auto" style="font-weight:bold;color:#0b5d95">${(qtyFromRange(l.start,l.end)||0).toLocaleString()}</td>
-<td><select id="${ulId(i,'status')}" onchange="updateUsageLine(${i},'status')"><option ${l.status==='Pending'?'selected':''}>Pending</option><option ${l.status==='Ready'?'selected':''}>Ready</option><option ${l.status==='Completed'?'selected':''}>Completed</option></select></td>
+<td><select id="${ulId(i,'status')}" onchange="updateUsageLine(${i},'status')"><option ${l.status==='Exhibit'?'selected':''}>Exhibit</option><option ${l.status==='Production'?'selected':''}>Production</option></select></td>
 <td><button type="button" class="btn danger" onclick="removeUsageLine(${i})">Remove</button></td>
 </tr>`}).join('');document.getElementById('usageLinesBody').innerHTML=rows||'<tr><td colspan="9" class="muted">No line items yet — click "+ Add Line" to begin.</td></tr>';renderUsageTotals()}
 function renderUsageTotals(){let total=usageLines.reduce((s,l)=>s+qtyFromRange(l.start,l.end),0);let totalEl=document.getElementById('usageLineTotal');if(totalEl)totalEl.textContent=total.toLocaleString();let dEl=document.getElementById('stockDeduct'),aEl=document.getElementById('stockAfter');if(dEl)dEl.textContent='-'+total.toLocaleString();if(aEl)aEl.textContent=(41230-total).toLocaleString()}
@@ -401,10 +400,10 @@ function updateWithdrawLine(i,fieldName){let el=document.getElementById(wlId(i,f
 function renderWithdrawLines(){let rows=withdrawLines.map((l,i)=>{let g=JSON.stringify({prefix:wlId(i,'prefix'),start:wlId(i,'start'),end:wlId(i,'end'),suffix:wlId(i,'suffix')});return `<tr>
 <td>${i+1}</td>
 <td><select id="${wlId(i,'batchRoll')}" onchange="updateWithdrawLine(${i},'batchRoll')"><option value="">Select</option>${batchRollOptions.map(b=>`<option ${l.batchRoll===b?'selected':''}>${b}</option>`).join('')}</select></td>
-<td>${qrIcon(wlId(i,'prefix'),`updateWithdrawLine(${i},'prefix')`,l.prefix,g)}</td>
+<td><input id="${wlId(i,'prefix')}" value="${l.prefix||''}" oninput="updateWithdrawLine(${i},'prefix')" style="width:55px"></td>
 <td>${qrIcon(wlId(i,'start'),`updateWithdrawLine(${i},'start')`,l.start,g)}</td>
 <td>${qrIcon(wlId(i,'end'),`updateWithdrawLine(${i},'end')`,l.end,g)}</td>
-<td>${qrIcon(wlId(i,'suffix'),`updateWithdrawLine(${i},'suffix')`,l.suffix,g)}</td>
+<td><input id="${wlId(i,'suffix')}" value="${l.suffix||''}" oninput="updateWithdrawLine(${i},'suffix')" style="width:55px"></td>
 <td id="${wlId(i,'qtydisplay')}" class="auto" style="font-weight:bold;color:#0b5d95">${(qtyFromRange(l.start,l.end)||0).toLocaleString()}</td>
 <td><select id="${wlId(i,'status')}" onchange="updateWithdrawLine(${i},'status')"><option ${l.status==='Pending'?'selected':''}>Pending</option><option ${l.status==='Ready'?'selected':''}>Ready</option><option ${l.status==='Completed'?'selected':''}>Completed</option></select></td>
 <td><button type="button" class="btn danger" onclick="removeWithdrawLine(${i})">Remove</button></td>
